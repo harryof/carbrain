@@ -6,14 +6,19 @@ import HomeScreen from "./src/screens/HomeScreen";
 import CarScreen from "./src/screens/CarScreen";
 import AddRecordScreen from "./src/screens/AddRecordScreen";
 
+import * as api from "./src/services/api";
+
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  const [records, setRecords] = useState([]);
+  const [records, setRecords] = useState(api.getRecords());
 
   const addRecord = (record) => {
-    setRecords((prev) => [...prev, record]);
+    api.addRecord(record);
+    setRecords(api.getRecords());
   };
+
 
   return (
     <NavigationContainer>

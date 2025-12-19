@@ -1,29 +1,62 @@
-import { Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, FlatList } from "react-native";
 import Screen from "../components/Screen";
 import Card from "../components/Card";
 import Button from "../components/Button";
+import { getRecommendationFromRecords } from "../services/recommendations";
 
-export default function CarScreen({ navigation }) {
+
+export default function CarScreen({ navigation, records = [] }) {
+  const mileage = "148 000 км";
+
+  const getVehicleRecommendation = () => {
+    return getRecommendationFromRecords(records).text;
+  };
+  
+
   return (
     <Screen>
-      <Text style={styles.title}>Toyota Camry</Text>
-      <Card>
-  <Text style={styles.section}>Состояние автомобиля</Text>
+      <Text style={styles.title}>Toyota Camry #12</Text>
+      <Text style={styles.subtitle}>Статус: в эксплуатации</Text>
 
-  <Text style={styles.statusOk}>● В норме: двигатель</Text>
-  <Text style={styles.statusWarn}>● Требует внимания: масло</Text>
-</Card>
-      <Card>
-        <Text style={styles.badge}>Рекомендация</Text>
-        <Text style={styles.warning}>
-          Рекомендуется замена масла
-        </Text>
+      {/* Vehicle info */}
+      <View style={styles.infoRow}>
+        <Text style={styles.infoLabel}>Пробег</Text>
+        <Text style={styles.infoValue}>{mileage}</Text>
+      </View>
 
-        <Button
-          title="Добавить запись"
-          onPress={() => navigation.navigate("AddRecord")}
+      {/* Records */}
+      <Text style={styles.section}>История обслуживания</Text>
+
+      {records.length === 0 ? (
+        <Text style={styles.empty}>Записей пока нет</Text>
+      ) : (
+        <FlatList
+          data={records}
+          keyExtractor={(_, i) => String(i)}
+          renderItem={({ item }) => (
+            <Card>
+              <Text style={styles.recordTitle}>{item.type}</Text>
+              <Text style={styles.recordMeta}>
+                Пробег: {item.mileage || "—"} км
+              </Text>
+              <Text style={styles.recordMeta}>
+                Дата: {item.date}
+              </Text>
+            </Card>
+          )}
         />
-      </Card>
+      )}
+
+      {/* Recommendation */}
+      <View style={styles.recommendation}>
+        <Text style={styles.recTitle}>CarBrain Recommendation</Text>
+        <Text style={styles.recText}>{getVehicleRecommendation()}</Text>
+      </View>
+
+      <Button
+        title="Добавить запись"
+        onPress={() => navigation.navigate("AddRecord")}
+      />
     </Screen>
   );
 }
@@ -31,39 +64,60 @@ export default function CarScreen({ navigation }) {
 const styles = StyleSheet.create({
   title: {
     color: "#FFF",
-    fontSize: 28,
+    fontSize: 26,
+    fontWeight: "600",
+    marginBottom: 4,
+  },
+  subtitle: {
+    color: "#9A9A9A",
+    marginBottom: 16,
+  },
+  infoRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 24,
   },
-  label: {
+  infoLabel: {
     color: "#9A9A9A",
-    marginBottom: 8,
   },
-  warning: {
+  infoValue: {
     color: "#FFF",
-    fontSize: 18,
+    fontWeight: "500",
   },
   section: {
-  color: "#9A9A9A",
-  marginBottom: 8,
-},
-statusOk: {
-  color: "#AAA",
-  marginBottom: 4,
-},
-statusWarn: {
-  color: "#FFF",
-  fontWeight: "500",
-},
-badge: {
-  alignSelf: "flex-start",
-  backgroundColor: "#1E1E1E",
-  color: "#FFF",
-  paddingHorizontal: 12,
-  paddingVertical: 4,
-  borderRadius: 12,
-  marginBottom: 8,
-  fontSize: 12,
-},
-
-
+    color: "#FFF",
+    fontSize: 16,
+    marginBottom: 12,
+  },
+  empty: {
+    color: "#666",
+    marginBottom: 16,
+  },
+  recordTitle: {
+    color: "#FFF",
+    fontSize: 15,
+    marginBottom: 4,
+  },
+  recordMeta: {
+    color: "#9A9A9A",
+    fontSize: 12,
+  },
+  recommendation: {
+    marginTop: 24,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#222",
+    backgroundColor: "#0E0E0E",
+    marginBottom: 16,
+  },
+  recTitle: {
+    color: "#FFF",
+    marginBottom: 6,
+    fontSize: 14,
+  },
+  recText: {
+    color: "#9A9A9A",
+    fontSize: 13,
+  },
 });
